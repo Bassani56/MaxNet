@@ -14,6 +14,7 @@ const usersHtml = fs.readFileSync(path.join(__dirname, "public", "users.html"), 
 const mongoUri = process.env.MONGODB_URI;
 const mongoDbName = process.env.MONGODB_DB_NAME || "Users";
 const mongoUsersCollection = process.env.MONGODB_USERS_COLLECTION || "database";
+const seedOnBoot = process.env.SEED_ON_BOOT === "true";
 let usersCollection;
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -52,8 +53,18 @@ async function initMongo() {
   usersCollection = db.collection(mongoUsersCollection);
 
   await usersCollection.createIndex({ username: 1 }, { unique: true });
-  await usersCollection.deleteMany({});
-  await usersCollection.insertMany(seedUsers);
+
+  if (seedOnBoot) {
+    await usersCollection.deleteMany({});
+    await usersCollection.insertMany(seedUsers);
+    console.log("Seed executado (SEED_ON_BOOT=true).");
+  } else {
+    const totalUsers = await usersCollection.countDocuments();
+    if (totalUsers === 0) {
+      await usersCollection.insertMany(seedUsers);
+      console.log("Seed inicial executado (colecao vazia).");
+    }
+  }
 
   console.log(`MongoDB conectado: ${mongoDbName}/${mongoUsersCollection}`);
 }
