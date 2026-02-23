@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Registrar Conta</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+body {
+  background: radial-gradient(circle at top, #020617, #000);
+  color: #e5e7eb;
+  font-family: "Courier New", monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.card {
+  background: #020617;
+  border: 1px solid #0f172a;
+  box-shadow: 0 0 30px rgba(59,130,246,.2);
+  padding: 30px;
+  width: 340px;
+  border-radius: 12px;
+}
+h1 {
+  text-align: center;
+  color: #3b82f6;
+  margin-bottom: 20px;
+}
+input, button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  color: #e5e7eb;
+}
+button {
+  background: #3b82f6;
+  color: #020617;
+  font-weight: bold;
+  cursor: pointer;
+}
+button:hover {
+  background: #2563eb;
+}
+.login-link {
+  display: block;
+  margin-top: 14px;
+  text-align: center;
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 13px;
+}
+.login-link:hover {
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>REGISTRAR</h1>
+  <form method="POST" action="/register">
+    <input name="username" placeholder="novo username">
+    <input name="password" placeholder="nova senha">
+    <button type="submit">CRIAR CONTA</button>
+  </form>
+  <a class="login-link" href="/login">Voltar para login</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Entrar - EntrarShop</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #020617, #000);
+  color: #e5e7eb;
+  font-family: "Courier New", monospace;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+.card {
+  background: #020617;
+  border: 1px solid #0f172a;
+  box-shadow: 0 0 30px rgba(34, 197, 94, .2);
+  padding: 30px;
+  width: 360px;
+  border-radius: 12px;
+}
+h1 {
+  text-align: center;
+  color: #22c55e;
+  margin: 0 0 20px;
+}
+input, button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  color: #e5e7eb;
+}
+button {
+  background: #22c55e;
+  color: #020617;
+  font-weight: bold;
+  cursor: pointer;
+}
+button:hover { background: #16a34a; }
+.nav-links {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+.nav-links a {
+  text-align: center;
+  color: #22c55e;
+  text-decoration: none;
+  font-size: 13px;
+}
+.nav-links a:hover { text-decoration: underline; }
+.error {
+  display: none;
+  margin-top: 10px;
+  padding: 8px;
+  border: 1px solid #7f1d1d;
+  background: #450a0a;
+  color: #fecaca;
+  text-align: center;
+  font-size: 13px;
+}
+.notice {
+  margin-top: 10px;
+  padding: 8px;
+  border: 1px solid #365314;
+  background: #1a2e05;
+  color: #d9f99d;
+  text-align: center;
+  font-size: 12px;
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>LOGIN</h1>
+  <div class="notice">Area interna: acesso permitido apenas para funcionarios autorizados.</div>
+  <form method="POST" action="/login">
+    <input name="username" placeholder="username" required>
+    <input name="password" placeholder="password" required>
+    <button type="submit">ENTRAR</button>
+  </form>
+  <div id="login-error" class="error">Usuario ou senha invalidos.</div>
+  <div class="nav-links">
+    <a href="/register">Registrar conta</a>
+    <a href="/">Voltar para a home</a>
+  </div>
+</div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("error") === "1") {
+    document.getElementById("login-error").style.display = "block";
+  }
+</script>
+</body>
+</html>
