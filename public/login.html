@@ -86,16 +86,24 @@ button:hover { background: #16a34a; }
     <input name="password" placeholder="password" required>
     <button type="submit">ENTRAR</button>
   </form>
-  <div id="login-error" class="error">Usuario ou senha invalidos.</div>
+  <div id="login-error" class="error"></div>
   <div class="nav-links">
-    <a href="/register">Registrar conta</a>
     <a href="/">Voltar para a home</a>
   </div>
 </div>
 <script>
   const params = new URLSearchParams(window.location.search);
-  if (params.get("error") === "1") {
-    document.getElementById("login-error").style.display = "block";
+  const error = params.get("error");
+  const errorMap = {
+    user_invalid: "Usuario invalido.",
+    password_invalid: "Senha invalida.",
+    both_invalid: "Usuario e senha invalidos.",
+  };
+
+  if (errorMap[error]) {
+    const errorElement = document.getElementById("login-error");
+    errorElement.textContent = errorMap[error];
+    errorElement.style.display = "block";
   }
 </script>
 </body>

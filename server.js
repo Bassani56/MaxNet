@@ -1,21 +1,22 @@
-require("dotenv").config();
+﻿require("dotenv").config();
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
+
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const fs = require("fs");
+
 const path = require("path");
 
 const app = express();
 const homeHtml = fs.readFileSync(path.join(__dirname, "public", "index.html"), "utf8");
 const loginHtml = fs.readFileSync(path.join(__dirname, "public", "login.html"), "utf8");
-const registerHtml = fs.readFileSync(path.join(__dirname, "public", "register.html"), "utf8");
 const usersHtml = fs.readFileSync(path.join(__dirname, "public", "users.html"), "utf8");
+
 const mongoUri = process.env.MONGODB_URI;
 const mongoDbName = process.env.MONGODB_DB_NAME || "Users";
 const mongoUsersCollection = process.env.MONGODB_USERS_COLLECTION || "database";
 const seedOnBoot = process.env.SEED_ON_BOOT === "true";
-let usersCollection;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
@@ -27,30 +28,71 @@ app.use(
 );
 
 const seedUsers = [
-  { username: "Daniel", password: "sensitive2006" },
+  { username: "Daniel", password: "linkinpark1996" },
   { username: "Jana", password: "janabanana" },
-  { username: "Silva", password: "joao2026" },
+  { username: "Silva", password: "palmeiras1914" },
   { username: "Maria", password: "maria123" },
   { username: "Carlos", password: "carlos789" },
   { username: "Ana", password: "ana456" },
-  { username: "Pedro", password: "pedro321" },
-  { username: "Juliana", password: "ju_alves" },
-  { username: "Rafael", password: "rafael007" },
-  { username: "Camila", password: "camila2026" },
-  { username: "Lucas", password: "lucas1234" },
-  { username: "Fernanda", password: "fernanda88" },
 ];
+
+const adminPublicProfileId = "manager";
+const publicUserIdByUsername = {
+  Jana: "1",
+  Maria: "2",
+  Silva: "3",
+  Carlos: "4",
+};
+
+const workAreaByUsername = {
+  Daniel: "Desenvolvedor SÃªnior | LÃ­der de Equipe",
+  Jana: "Desenvolvedora Frontend",
+  Silva: "Desenvolvedor Backend",
+  Maria: "Desenvolvedora Frontend",
+  Carlos: "Diretor Comercial",
+};
+
+function getPublicProfileIdByUsername(username) {
+  if (username === "Daniel") {
+    return adminPublicProfileId;
+  }
+  return publicUserIdByUsername[username] || null;
+}
+
+function getUsernameByPublicProfileId(profileId) {
+  if (profileId === adminPublicProfileId) {
+    return "Daniel";
+  }
+
+  const foundEntry = Object.entries(publicUserIdByUsername).find(
+    ([, id]) => String(id) === String(profileId)
+  );
+
+  return foundEntry ? foundEntry[0] : null;
+}
+
+function getWorkAreaByUsername(username) {
+  return workAreaByUsername[username] || "frontend";
+}
+
+function isBackendUser(username) {
+  return String(username || "").trim() === "Silva";
+}
+
+let usersCollection;
 
 async function initMongo() {
   if (!mongoUri) {
     throw new Error("Defina MONGODB_URI no ambiente.");
   }
 
+
   const client = new MongoClient(mongoUri);
   await client.connect();
 
   const db = client.db(mongoDbName);
   usersCollection = db.collection(mongoUsersCollection);
+
 
   await usersCollection.createIndex({ username: 1 }, { unique: true });
 
@@ -59,6 +101,9 @@ async function initMongo() {
     await usersCollection.insertMany(seedUsers);
     console.log("Seed executado (SEED_ON_BOOT=true).");
   } else {
+
+    console.log('aqui::  ')
+
     const totalUsers = await usersCollection.countDocuments();
     if (totalUsers === 0) {
       await usersCollection.insertMany(seedUsers);
@@ -72,28 +117,34 @@ async function initMongo() {
 function buildEmployeeProfile(userId, username) {
   const profileMap = {
     daniel: {
-      name: "Daniel Bassani Fabricio",
+      name: "Daniel Bassani",
       role: "Gerente",
       team: "Infra e Seguranca",
       phone: "+55 11 95555-1001",
     },
-    luana: {
-      name: "Luana Ribeiro",
+    jana: {
+      name: "Jana Ina",
       role: "Desenvolvedora Frontend",
       team: "Produto Web",
       phone: "+55 11 95555-1022",
     },
-    rafael: {
-      name: "Rafael Nunes",
-      role: "Analista de Seguranca",
-      team: "Infra e Seguranca",
+    silva: {
+      name: "Silva da Cunha",
+      role: "Desenvolvedor Full Stack",
+      team: "Tecnologia",
       phone: "+55 11 95555-1038",
     },
-    camila: {
-      name: "Camila Duarte",
-      role: "Gerente de Projeto",
-      team: "Gestao de Produto",
+    maria: {
+      name: "Maria Gomes",
+      role: "Desenvolvedora Frontend",
+      team: "Produto Web",
       phone: "+55 11 95555-1045",
+    },
+    carlos: {
+      name: "Carlos Almeida",
+      role: "Diretor Comercial",
+      team: "Comercial",
+      phone: "+55 11 95555-1090",
     },
     ana: {
       name: "Ana Carvalho",
@@ -104,45 +155,76 @@ function buildEmployeeProfile(userId, username) {
   };
 
   const normalizedUsername = String(username || "").toLowerCase();
-  const entry = profileMap[normalizedUsername] || {
+  const defaultEntry = {
     name: `Funcionario ${username}`,
     role: "Colaborador Interno",
     team: "Operacoes",
     phone: "+55 11 95555-0000",
+    favorites: {
+      language: "Node",
+      editor: "VS Code",
+      team: "Indefinido",
+    },
+    avatarYear: "2000",
+    stats: {
+      followers: "0",
+      likes: "0",
+      photos: "0",
+    },
+    note: "Sem anotacoes internas.",
+  };
+  const entry = {
+    ...defaultEntry,
+    ...(profileMap[normalizedUsername] || {}),
   };
 
+  const publicProfileId = getPublicProfileIdByUsername(username);
+
   return {
-    id: userId,
+    id: publicProfileId || userId,
     username,
     name: entry.name,
     role: entry.role,
+    workArea: getWorkAreaByUsername(username),
     team: entry.team,
     phone: entry.phone,
     email: `${username}@empresa-interna.local`,
+    avatarYear: entry.avatarYear,
+    favorites: entry.favorites,
+    stats: entry.stats,
+    note: entry.note,
   };
 }
 
 function renderEmployeeAreaHtml(profile) {
-  return usersHtml
-    .replace("{{CURRENT_USER}}", profile.username)
-    .replace("{{PROFILE_NAME}}", profile.name)
-    .replace("{{PROFILE_USERNAME}}", profile.username)
-    .replace("{{PROFILE_ID}}", String(profile.id))
-    .replace("{{PROFILE_ROLE}}", profile.role)
-    .replace("{{PROFILE_EMAIL}}", profile.email)
-    .replace("{{PROFILE_PHONE}}", profile.phone)
-    .replace("{{PROFILE_TEAM}}", profile.team);
+  const templateData = {
+    CURRENT_USER: profile.username,
+    PROFILE_NAME: profile.name,
+    PROFILE_USERNAME: profile.username,
+    PROFILE_ID: String(profile.id),
+    PROFILE_ROLE: profile.role,
+    PROFILE_WORK_AREA: profile.workArea,
+    PROFILE_EMAIL: profile.email,
+    PROFILE_PHONE: profile.phone,
+    PROFILE_TEAM: profile.team,
+    PROFILE_AVATAR_YEAR: profile.avatarYear,
+    PROFILE_FAV_LANGUAGE: profile.favorites.language,
+    PROFILE_FAV_EDITOR: profile.favorites.editor,
+    PROFILE_FAV_TEAM: profile.favorites.team,
+    PROFILE_STATS_FOLLOWERS: profile.stats.followers,
+    PROFILE_STATS_LIKES: profile.stats.likes,
+    PROFILE_STATS_PHOTOS: profile.stats.photos,
+    PROFILE_INTERNAL_NOTE: profile.note,
+  };
+
+  return Object.entries(templateData).reduce((html, [key, value]) => {
+    return html.replaceAll(`{{${key}}}`, value);
+  }, usersHtml);
 }
 
 function buildInternalCommits() {
   return [
-    {
-      sha: "a91c2f0",
-      author: "luana",
-      message: "fix(home): ajustar bloco de contato e espaco mobile",
-      date: "2026-02-21T09:12:00Z",
-      source: "GitHub",
-    },
+    
     {
       sha: "b23d8aa",
       author: "ana",
@@ -150,20 +232,7 @@ function buildInternalCommits() {
       date: "2026-02-21T10:04:00Z",
       source: "GitHub",
     },
-    {
-      sha: "c44e6bd",
-      author: "rafael",
-      message: "security(login): revisar regra de acesso da area administrativa",
-      date: "2026-02-21T10:48:00Z",
-      source: "GitHub",
-    },
-    {
-      sha: "d71f93e",
-      author: "camila",
-      message: "docs(project): atualizar notas da entrega da sprint",
-      date: "2026-02-21T11:10:00Z",
-      source: "GitHub",
-    },
+   
     {
       sha: "e8b41ad",
       author: "carlos",
@@ -173,28 +242,28 @@ function buildInternalCommits() {
     },
     {
       sha: "f29ab17",
-      author: "juliana",
+      author: "carlos",
       message: "feat(users): criar area de perfil para funcionarios",
       date: "2026-02-21T12:02:00Z",
       source: "GitHub",
     },
     {
       sha: "08cd2f9",
-      author: "pedro",
+      author: "silva",
       message: "fix(session): reduzir timeout de sessao ociosa",
       date: "2026-02-21T12:19:00Z",
       source: "GitHub",
     },
     {
       sha: "19ef33c",
-      author: "fernanda",
+      author: "daniel",
       message: "docs(security): registrar fluxo de permissoes admin",
       date: "2026-02-21T12:41:00Z",
       source: "GitHub",
     },
     {
       sha: "2af0451",
-      author: "lucas",
+      author: "jana",
       message: "perf(db): revisar indices da tabela users",
       date: "2026-02-21T13:05:00Z",
       source: "GitHub",
@@ -215,18 +284,12 @@ function buildInternalCommits() {
     },
     {
       sha: "5e2bf44",
-      author: "luana",
+      author: "maria",
       message: "chore: pendencia de endpoint TWF4TmV0 para revisao",
       date: "2026-02-21T14:04:00Z",
       source: "GitHub",
     },
-    {
-      sha: "6f3c8b0",
-      author: "rafael",
-      message: "note: referencia de auditoria https://github.com",
-      date: "2026-02-21T14:28:00Z",
-      source: "GitHub",
-    },
+    
     {
       sha: "70a5dd1",
       author: "ana",
@@ -234,13 +297,7 @@ function buildInternalCommits() {
       date: "2026-02-21T14:52:00Z",
       source: "GitHub",
     },
-    {
-      sha: "81b611a",
-      author: "camila",
-      message: "pm(update): ajustar checklist da sprint para sexta",
-      date: "2026-02-21T15:07:00Z",
-      source: "GitHub",
-    },
+
     {
       sha: "92c7f03",
       author: "carlos",
@@ -248,34 +305,7 @@ function buildInternalCommits() {
       date: "2026-02-21T15:30:00Z",
       source: "GitHub",
     },
-    {
-      sha: "a3d8be4",
-      author: "pedro",
-      message: "fix(login): mensagem de erro para credenciais invalidas",
-      date: "2026-02-21T15:46:00Z",
-      source: "GitHub",
-    },
-    {
-      sha: "b4e9265",
-      author: "fernanda",
-      message: "qa: revisar compatibilidade do painel em resolucao baixa",
-      date: "2026-02-21T16:12:00Z",
-      source: "GitHub",
-    },
-    {
-      sha: "c50af98",
-      author: "juliana",
-      message: "feat(chat): inserir mensagens iniciais do grupo interno",
-      date: "2026-02-21T16:39:00Z",
-      source: "GitHub",
-    },
-    {
-      sha: "d6b13ac",
-      author: "lucas",
-      message: "db: conferir consistencia de ids apos cadastro",
-      date: "2026-02-21T17:02:00Z",
-      source: "GitHub",
-    },
+
     {
       sha: "e7c2d9f",
       author: "maria",
@@ -374,6 +404,84 @@ function requireAdmin(req, res, next) {
   return next();
 }
 
+function requireBackend(req, res, next) {
+  if (!req.session.user || !isBackendUser(req.session.user.username)) {
+    return res.status(403).send("Acesso restrito ao funcionario do setor.");
+  }
+  return next();
+}
+
+function decodeJwtPart(part) {
+  try {
+    return JSON.parse(Buffer.from(part, "base64url").toString("utf8"));
+  } catch (error) {
+    return null;
+  }
+}
+
+function hasWeakInternalApiAccess(req) {
+  if (req.session.user && isBackendUser(req.session.user.username)) {
+    return true;
+  }
+
+  if (String(req.headers["x-internal-request"] || "").toLowerCase() === "true") {
+    return true;
+  }
+
+  if (String(req.headers["x-employee-role"] || "").toLowerCase() === "backend") {
+    return true;
+  }
+
+  const authHeader = String(req.headers.authorization || "");
+  if (!authHeader.startsWith("Bearer ")) {
+    return false;
+  }
+
+  const token = authHeader.slice(7).trim();
+  const parts = token.split(".");
+  if (parts.length < 2) {
+    return false;
+  }
+
+  const header = decodeJwtPart(parts[0]);
+  const payload = decodeJwtPart(parts[1]);
+
+  if (!header || !payload) {
+    return false;
+  }
+
+  // Vulnerabilidade intencional para CTF: confia em alg=none e nao valida assinatura.
+  return String(header.alg || "").toLowerCase() === "none" && String(payload.role || "").toLowerCase() === "backend";
+}
+
+function requireInternalTeamsAccess(req, res, next) {
+  if (!hasWeakInternalApiAccess(req)) {
+    return res.status(403).send("Acesso restrito ao funcionario do setor.");
+  }
+  return next();
+}
+
+app.use(express.static(path.join(__dirname, "public")));
+
+const sensitiveRoutes = ["/old-login", "/admin-backup", "/manager/commits", "/search"];
+
+app.get("/internal/teams", requireInternalTeamsAccess, (req, res) => {
+  return res.json({
+    teams: {
+      // backend: {
+      //   internal_tools: ["/search", "/logs"],
+      // },
+      manager: {
+        restricted_tools: ["/manager/commits"],
+      },
+    },
+    logs: [
+      "manager pushed security fix",
+      "commit reverted previous file removal",
+    ],
+  });
+});
+
 // Pagina inicial estilizada
 app.get("/", (req, res) => {
   res.send(homeHtml);
@@ -383,23 +491,57 @@ app.get("/login", (req, res) => {
   res.send(loginHtml);
 });
 
-app.get("/register", (req, res) => {
-  res.send(registerHtml);
-});
-
 app.get("/users", requireLogin, async (req, res) => {
   try {
-    let user = null;
-    if (req.session.user && req.session.user.id) {
-      user = await usersCollection.findOne({ _id: new ObjectId(req.session.user.id) });
+    if (!req.session.user || !req.session.user.id) {
+      return res.redirect("/login");
     }
 
-    const id = user ? user._id.toString() : req.session.user.id;
-    const username = user ? user.username : req.session.user.username;
-    const profile = buildEmployeeProfile(id, username);
+    const user = await usersCollection.findOne({ _id: new ObjectId(req.session.user.id) });
+    const profileId = getPublicProfileIdByUsername(user ? user.username : req.session.user.username);
+
+    if (profileId) {
+      return res.redirect(`/users/${profileId}`);
+    }
+
+    const fallbackId = user ? user._id.toString() : req.session.user.id;
+    return res.redirect(`/users/${fallbackId}`);
+  } catch (error) {
+    console.error("Erro ao resolver perfil da sessao:", error.message);
+    return res.status(500).send("Erro ao consultar perfil.");
+  }
+});
+
+// Vulnerabilidade intencional (IDOR): qualquer funcionario autenticado pode
+// acessar o perfil de outros funcionarios trocando o ID na URL.
+app.get("/users/:profileId", requireLogin, async (req, res) => {
+  const requestedProfileId = String(req.params.profileId || "").trim();
+
+  try {
+    if (
+      requestedProfileId === adminPublicProfileId &&
+      (!req.session.user || req.session.user.username !== "Daniel")
+    ) {
+      return res.status(403).send("Acesso restrito ao admin.");
+    }
+
+    const mappedUsername = getUsernameByPublicProfileId(requestedProfileId);
+    let user = null;
+
+    if (mappedUsername) {
+      user = await usersCollection.findOne({ username: mappedUsername });
+    } else if (ObjectId.isValid(requestedProfileId)) {
+      user = await usersCollection.findOne({ _id: new ObjectId(requestedProfileId) });
+    }
+
+    if (!user) {
+      return res.status(404).send("Funcionario nao encontrado.");
+    }
+
+    const profile = buildEmployeeProfile(requestedProfileId, user.username);
     return res.send(renderEmployeeAreaHtml(profile));
   } catch (error) {
-    console.error("Erro ao buscar usuario da sessao:", error.message);
+    console.error("Erro ao buscar perfil por ID:", error.message);
     return res.status(500).send("Erro ao consultar perfil.");
   }
 });
@@ -410,47 +552,74 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.post("/register", async (req, res) => {
+async function renderManagerArea(req, res) {
+  try {
+    const adminUser = await usersCollection.findOne({ username: "Daniel" });
+    if (!adminUser) {
+      return res.status(404).send("Funcionario nao encontrado.");
+    }
+    const adminProfile = buildEmployeeProfile(adminPublicProfileId, adminUser.username);
+    return res.send(renderEmployeeAreaHtml(adminProfile));
+  } catch (error) {
+    console.error("Erro ao carregar area do manager:", error.message);
+    return res.status(500).send("Erro ao consultar perfil.");
+  }
+}
+
+// app.get("/manager", requireLogin, requireAdmin, renderManagerArea);
+app.get("/users/manager", requireLogin, requireAdmin, renderManagerArea);
+
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   const cleanUsername = (username || "").trim();
   const cleanPassword = (password || "").trim();
 
-  if (!cleanUsername || !cleanPassword) {
-    return res.status(400).send("Username e senha sao obrigatorios.");
-  }
-
   try {
-    const existing = await usersCollection.findOne({ username: cleanUsername });
-    if (existing) {
-      return res.status(409).send("Usuario ja existe. Tente outro username.");
+    if (!cleanUsername && !cleanPassword) {
+      return res.redirect("/login?error=both_invalid");
+    }
+    if (!cleanUsername) {
+      return res.redirect("/login?error=user_invalid");
+    }
+    if (!cleanPassword) {
+      return res.redirect("/login?error=password_invalid");
     }
 
-    await usersCollection.insertOne({ username: cleanUsername, password: cleanPassword });
-    return res.redirect("/login");
-  } catch (error) {
-    console.error("Erro ao cadastrar usuario:", error.message);
-    return res.status(500).send("Erro ao cadastrar usuario.");
-  }
-});
+    const user = await usersCollection.findOne({ username: cleanUsername });
+    if (!user) {
+      const passwordExists = await usersCollection.findOne({ password: cleanPassword });
+      if (!passwordExists) {
+        return res.redirect("/login?error=both_invalid");
+      }
+      return res.redirect("/login?error=user_invalid");
+    }
 
-// Login vulneravel
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const row = await usersCollection.findOne({ username, password });
+    if (user.password !== cleanPassword) {
+      return res.redirect("/login?error=password_invalid");
+    }
 
-    if (row) {
-      req.session.user = { id: row._id.toString(), username: row.username };
+    req.session.user = {
+      id: user._id.toString(),
+      username: user.username,
+      workArea: getWorkAreaByUsername(user.username),
+    };
       return res.redirect("/users");
-    }
-    return res.redirect("/login?error=1");
   } catch (error) {
     console.error("Erro no login:", error.message);
     return res.status(500).send("Erro interno no servidor.");
   }
 });
 
-app.get("/admin/commits", requireAdmin, async (req, res) => {
+
+function requireAdminHidden(req, res, next) {
+  if (!req.session.user || req.session.user.username !== "Daniel") {
+    return res.status(404).send("Not Found");
+  }
+  return next();
+}
+
+app.get(["/users/manager/commits"], requireLogin, requireAdminHidden, async (req, res) => {
+
   const owner = process.env.GITHUB_OWNER;
   const repo = process.env.GITHUB_REPO;
   const token = process.env.GITHUB_TOKEN;
@@ -514,3 +683,4 @@ async function startServer() {
 }
 
 startServer();
+

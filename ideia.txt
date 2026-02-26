@@ -1,0 +1,57 @@
+﻿# CTF - MaxNet (Resumo)
+
+## Objetivo
+Comprometer o ambiente interno da MaxNet explorando falhas encadeadas (OSINT, IDOR, enumeração de rotas, autenticação fraca e API mal configurada) até recuperar a flag final em histórico de commits.
+
+## Skills Testadas
+- Enumeração web (`dirb`/fuzzing)
+- Bruteforce de login
+- IDOR (`/users/:profileId`)
+- OSINT e engenharia social (Facebook/LinkedIn)
+- Bypass de controle de acesso em API interna
+- Análise de commits e histórico Git/GitHub
+- Decodificação de pistas em Base64
+
+## Superfície Inicial
+Rotas visíveis/descobertas:
+- `GET /`
+- `GET /login`
+- `GET /users`
+- `GET /users/:profileId` (ex.: `/users/1`, `/users/manager`)
+- `GET /users/manager`
+- `GET /users/manager/commits`
+- `GET /internal/teams`
+- `GET /logout`
+
+## Fluxo Esperado (Solve)
+1. Investigar a home e coletar pista de funcionário em comentário HTML.
+2. Fazer bruteforce e obter primeiro acesso.
+3. Perceber IDOR em `/users/:profileId` e enumerar funcionários/cargos.
+4. Usar OSINT (Facebook da MaxNet + perfis de funcionários) para inferir senhas.
+5. Tentar acessar rotas restritas e identificar que precisa de contexto backend/admin.
+6. Explorar `/internal/teams` para obter rotas internas sensíveis.
+7. Comprometer conta de gerente/admin e acessar `/users/manager/commits` (ou `/manager/commits`).
+8. Encontrar pistas em Base64 -> usuário/projeto GitHub.
+9. Ir ao histórico de commits, localizar remoção de arquivo após “correção de falha de segurança”.
+10. Voltar ao commit anterior e recuperar a flag.
+
+## Falhas Intencionais no Desafio
+- Vazamento de informação em comentário HTML da home.
+- Credenciais fracas e suscetíveis a bruteforce.
+- IDOR em `/users/:profileId`.
+- Controle de acesso quebrado entre perfis/setores.
+- Engenharia social viável por exposição em redes sociais.
+
+### Nova falha de API interna (`/internal/teams`)
+A rota aceita acesso indevido por confiança em dados não confiáveis:
+- Header `X-Internal-Request: true`
+- Header `X-Employee-Role: backend`
+- JWT com `alg: none` e `role: backend` sem validação de assinatura
+
+Resposta atual da rota:
+```json
+{"routes":["/old-login","/admin-backup","/manager/commits","/search"]}
+```
+
+## Condição de Vitória
+Obter a flag no repositório/histórico de commits após seguir a cadeia completa de exploração.

@@ -1,0 +1,3 @@
+Disallow: /old-login
+Disallow: /admin-backup
+# TODO remover rotas antigas antes de subir para produção
