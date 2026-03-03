@@ -1,3 +1,4 @@
 Disallow: /old-login
 Disallow: /admin-backup
+Disallow: /api
 # TODO remover rotas antigas antes de subir para produção

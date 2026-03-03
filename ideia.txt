@@ -42,7 +42,7 @@ Rotas visíveis/descobertas:
 - Controle de acesso quebrado entre perfis/setores.
 - Engenharia social viável por exposição em redes sociais.
 
-### Nova falha de API interna (`/internal/teams`)
+### Nova falha de API interna (`/api`)
 A rota aceita acesso indevido por confiança em dados não confiáveis:
 - Header `X-Internal-Request: true`
 - Header `X-Employee-Role: backend`
@@ -50,7 +50,7 @@ A rota aceita acesso indevido por confiança em dados não confiáveis:
 
 Resposta atual da rota:
 ```json
-{"routes":["/old-login","/admin-backup","/manager/commits","/search"]}
+{"routes":["/old-login","/admin-backup","/admin/commits"]}
 ```
 
 ## Condição de Vitória

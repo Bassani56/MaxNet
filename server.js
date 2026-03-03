@@ -29,7 +29,7 @@ app.use(
 
 const seedUsers = [
   { username: "Daniel", password: "linkinpark1996" },
-  { username: "Jana", password: "janabanana" },
+  { username: "Jana", password: "babyblue" },
   { username: "Silva", password: "palmeiras1914" },
   { username: "Maria", password: "maria123" },
   { username: "Carlos", password: "carlos789" },
@@ -45,7 +45,7 @@ const publicUserIdByUsername = {
 };
 
 const workAreaByUsername = {
-  Daniel: "Desenvolvedor SÃªnior | LÃ­der de Equipe",
+  Daniel: "Desenvolvedor Sênior | Líder de Equipe",
   Jana: "Desenvolvedora Frontend",
   Silva: "Desenvolvedor Backend",
   Maria: "Desenvolvedora Frontend",
@@ -463,16 +463,16 @@ function requireInternalTeamsAccess(req, res, next) {
 
 app.use(express.static(path.join(__dirname, "public")));
 
-const sensitiveRoutes = ["/old-login", "/admin-backup", "/manager/commits", "/search"];
+const sensitiveRoutes = ["/old-login", "/admin-backup", "admin/commits", "/search"];
 
-app.get("/internal/teams", requireInternalTeamsAccess, (req, res) => {
+app.get("/api", (req, res) => {
   return res.json({
     teams: {
       // backend: {
       //   internal_tools: ["/search", "/logs"],
       // },
       manager: {
-        restricted_tools: ["/manager/commits"],
+        restricted_tools: ["admin/commits"],
       },
     },
     logs: [
@@ -511,6 +511,11 @@ app.get("/users", requireLogin, async (req, res) => {
     return res.status(500).send("Erro ao consultar perfil.");
   }
 });
+
+
+// app.get("/manager", requireLogin, requireAdmin, renderManagerArea);
+app.get("/users/admin", requireLogin, requireAdmin, renderManagerArea);
+
 
 // Vulnerabilidade intencional (IDOR): qualquer funcionario autenticado pode
 // acessar o perfil de outros funcionarios trocando o ID na URL.
@@ -566,8 +571,6 @@ async function renderManagerArea(req, res) {
   }
 }
 
-// app.get("/manager", requireLogin, requireAdmin, renderManagerArea);
-app.get("/users/manager", requireLogin, requireAdmin, renderManagerArea);
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -618,7 +621,7 @@ function requireAdminHidden(req, res, next) {
   return next();
 }
 
-app.get(["/users/manager/commits"], requireLogin, requireAdminHidden, async (req, res) => {
+app.get(["/users/admin/commits"], requireLogin, requireAdminHidden, async (req, res) => {
 
   const owner = process.env.GITHUB_OWNER;
   const repo = process.env.GITHUB_REPO;
