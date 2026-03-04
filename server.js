@@ -28,40 +28,45 @@ app.use(
 );
 
 const seedUsers = [
-  { username: "Daniel", password: "linkinpark1996" },
-  { username: "Jana", password: "babyblue" },
-  { username: "Silva", password: "palmeiras1914" },
-  { username: "Maria", password: "maria123" },
-  { username: "Carlos", password: "carlos789" },
-  { username: "Ana", password: "ana456" },
+  { username: "daniel", password: "linkinpark1996" },
+  { username: "jana", password: "babyblue" },
+  { username: "silva", password: "palmeiras1914" },
+  { username: "maria", password: "maria123" },
+  { username: "carlos", password: "carlos789" },
+  { username: "ana", password: "ana456" },
 ];
 
-const adminPublicProfileId = "manager";
+const adminPublicProfileId = "0";
 const publicUserIdByUsername = {
-  Jana: "1",
-  Maria: "2",
-  Silva: "3",
-  Carlos: "4",
+  jana: "1",
+  maria: "2",
+  silva: "3",
+  carlos: "4",
 };
 
 const workAreaByUsername = {
-  Daniel: "Desenvolvedor Sênior | Líder de Equipe",
-  Jana: "Desenvolvedora Frontend",
-  Silva: "Desenvolvedor Backend",
-  Maria: "Desenvolvedora Frontend",
-  Carlos: "Diretor Comercial",
+  daniel: "Desenvolvedor Sênior | Líder de Equipe",
+  jana: "Desenvolvedora Frontend",
+  silva: "Desenvolvedor Backend",
+  maria: "Desenvolvedora Frontend",
+  carlos: "Diretor Comercial",
 };
 
+function normalizeUsername(username) {
+  return String(username || "").trim().toLowerCase();
+}
+
 function getPublicProfileIdByUsername(username) {
-  if (username === "Daniel") {
+  const normalizedUsername = normalizeUsername(username);
+  if (normalizedUsername === "daniel") {
     return adminPublicProfileId;
   }
-  return publicUserIdByUsername[username] || null;
+  return publicUserIdByUsername[normalizedUsername] || null;
 }
 
 function getUsernameByPublicProfileId(profileId) {
   if (profileId === adminPublicProfileId) {
-    return "Daniel";
+    return "daniel";
   }
 
   const foundEntry = Object.entries(publicUserIdByUsername).find(
@@ -72,11 +77,31 @@ function getUsernameByPublicProfileId(profileId) {
 }
 
 function getWorkAreaByUsername(username) {
-  return workAreaByUsername[username] || "frontend";
+  return workAreaByUsername[normalizeUsername(username)] || "frontend";
 }
 
 function isBackendUser(username) {
-  return String(username || "").trim() === "Silva";
+  return normalizeUsername(username) === "silva";
+}
+
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+async function findUserByUsername(username) {
+  const normalizedUsername = normalizeUsername(username);
+  if (!normalizedUsername) {
+    return null;
+  }
+
+  const exactUser = await usersCollection.findOne({ username: normalizedUsername });
+  if (exactUser) {
+    return exactUser;
+  }
+
+  return usersCollection.findOne({
+    username: { $regex: `^${escapeRegex(normalizedUsername)}$`, $options: "i" },
+  });
 }
 
 let usersCollection;
@@ -398,7 +423,7 @@ function requireLogin(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
-  if (!req.session.user || req.session.user.username !== "Daniel") {
+  if (!req.session.user || normalizeUsername(req.session.user.username) !== "daniel") {
     return res.status(403).send("Acesso restrito ao admin.");
   }
   return next();
@@ -463,20 +488,15 @@ function requireInternalTeamsAccess(req, res, next) {
 
 app.use(express.static(path.join(__dirname, "public")));
 
-const sensitiveRoutes = ["/old-login", "/admin-backup", "admin/commits", "/search"];
-
 app.get("/api", (req, res) => {
   return res.json({
     teams: {
-      // backend: {
-      //   internal_tools: ["/search", "/logs"],
-      // },
-      manager: {
-        restricted_tools: ["admin/commits"],
+      admin: {
+        restricted_tools: ["users/0/commits"],
       },
     },
     logs: [
-      "manager pushed security fix",
+      "admin pushed security fix",
       "commit reverted previous file removal",
     ],
   });
@@ -497,15 +517,18 @@ app.get("/users", requireLogin, async (req, res) => {
       return res.redirect("/login");
     }
 
-    const user = await usersCollection.findOne({ _id: new ObjectId(req.session.user.id) });
+    let user = null;
+    if (ObjectId.isValid(req.session.user.id)) {
+      user = await usersCollection.findOne({ _id: new ObjectId(req.session.user.id) });
+    }
+
     const profileId = getPublicProfileIdByUsername(user ? user.username : req.session.user.username);
 
-    if (profileId) {
+    if (profileId !== null) {
       return res.redirect(`/users/${profileId}`);
     }
 
-    const fallbackId = user ? user._id.toString() : req.session.user.id;
-    return res.redirect(`/users/${fallbackId}`);
+    return res.status(404).send("Perfil publico nao mapeado.");
   } catch (error) {
     console.error("Erro ao resolver perfil da sessao:", error.message);
     return res.status(500).send("Erro ao consultar perfil.");
@@ -514,7 +537,6 @@ app.get("/users", requireLogin, async (req, res) => {
 
 
 // app.get("/manager", requireLogin, requireAdmin, renderManagerArea);
-app.get("/users/admin", requireLogin, requireAdmin, renderManagerArea);
 
 
 // Vulnerabilidade intencional (IDOR): qualquer funcionario autenticado pode
@@ -525,18 +547,15 @@ app.get("/users/:profileId", requireLogin, async (req, res) => {
   try {
     if (
       requestedProfileId === adminPublicProfileId &&
-      (!req.session.user || req.session.user.username !== "Daniel")
+      (!req.session.user || normalizeUsername(req.session.user.username) !== "daniel")
     ) {
       return res.status(403).send("Acesso restrito ao admin.");
     }
 
     const mappedUsername = getUsernameByPublicProfileId(requestedProfileId);
     let user = null;
-
     if (mappedUsername) {
-      user = await usersCollection.findOne({ username: mappedUsername });
-    } else if (ObjectId.isValid(requestedProfileId)) {
-      user = await usersCollection.findOne({ _id: new ObjectId(requestedProfileId) });
+      user = await findUserByUsername(mappedUsername);
     }
 
     if (!user) {
@@ -559,7 +578,7 @@ app.get("/logout", (req, res) => {
 
 async function renderManagerArea(req, res) {
   try {
-    const adminUser = await usersCollection.findOne({ username: "Daniel" });
+    const adminUser = await findUserByUsername("daniel");
     if (!adminUser) {
       return res.status(404).send("Funcionario nao encontrado.");
     }
@@ -574,7 +593,7 @@ async function renderManagerArea(req, res) {
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  const cleanUsername = (username || "").trim();
+  const cleanUsername = normalizeUsername(username);
   const cleanPassword = (password || "").trim();
 
   try {
@@ -588,7 +607,7 @@ app.post("/login", async (req, res) => {
       return res.redirect("/login?error=password_invalid");
     }
 
-    const user = await usersCollection.findOne({ username: cleanUsername });
+    const user = await findUserByUsername(cleanUsername);
     if (!user) {
       const passwordExists = await usersCollection.findOne({ password: cleanPassword });
       if (!passwordExists) {
@@ -615,13 +634,13 @@ app.post("/login", async (req, res) => {
 
 
 function requireAdminHidden(req, res, next) {
-  if (!req.session.user || req.session.user.username !== "Daniel") {
+  if (!req.session.user || normalizeUsername(req.session.user.username) !== "daniel") {
     return res.status(404).send("Not Found");
   }
   return next();
 }
 
-app.get(["/users/admin/commits"], requireLogin, requireAdminHidden, async (req, res) => {
+app.get(["/users/0/commits"], requireLogin, requireAdminHidden, async (req, res) => {
 
   const owner = process.env.GITHUB_OWNER;
   const repo = process.env.GITHUB_REPO;
@@ -686,4 +705,3 @@ async function startServer() {
 }
 
 startServer();
-
