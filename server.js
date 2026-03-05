@@ -33,7 +33,7 @@ const seedUsers = [
   { username: "silva", password: "palmeiras1914" },
   { username: "maria", password: "maria123" },
   { username: "carlos", password: "carlos789" },
-  { username: "ana", password: "ana456" },
+
 ];
 
 const adminPublicProfileId = "0";
@@ -145,37 +145,46 @@ function buildEmployeeProfile(userId, username) {
       name: "Daniel Bassani",
       role: "Gerente",
       team: "Infra e Seguranca",
-      phone: "+55 11 95555-1001",
+      phone: "+55 11 4002-8922",
+      photoUrl: "https://images.unsplash.com/photo-1758518727984-17b37f2f0562?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBidXNpbmVzcyUyMG1hbiUyMGNvcnBvcmF0ZXxlbnwxfHx8fDE3NzIxMDM2MzV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",      
     },
     jana: {
       name: "Jana Ina",
       role: "Desenvolvedora Frontend",
       team: "Produto Web",
-      phone: "+55 11 95555-1022",
+      phone: "+55 11 4002-8922",
+      photoUrl:
+        "https://images.unsplash.com/photo-1581065178047-8ee15951ede6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBidXNpbmVzcyUyMHdvbWFuJTIwcG9ydHJhaXR8ZW58MXx8fHwxNzcyMDI4MzEyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     silva: {
       name: "Silva da Cunha",
       role: "Desenvolvedor Full Stack",
       team: "Tecnologia",
-      phone: "+55 11 95555-1038",
+      phone: "+55 11 4002-8922",
+      photoUrl:
+        "https://images.unsplash.com/photo-1658250273007-ced0cbd4c038?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBsYXRpbm8lMjBtYW4lMjBidXNpbmVzc3xlbnwxfHx8fDE3NzIxMDM2MzV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     maria: {
       name: "Maria Gomes",
       role: "Desenvolvedora Frontend",
       team: "Produto Web",
-      phone: "+55 11 95555-1045",
+      phone: "+55 11 4002-8922",
+      photoUrl:
+        "https://media.istockphoto.com/id/1330522839/pt/foto/young-woman-contemplating-at-home.jpg?s=2048x2048&w=is&k=20&c=mIlIrdHq1uc_JBwNIxuPUT5k0f4th1H6QN-WPDUkkw0=",
     },
     carlos: {
       name: "Carlos Almeida",
       role: "Diretor Comercial",
       team: "Comercial",
-      phone: "+55 11 95555-1090",
+      phone: "+55 11 4002-8922",
+      photoUrl:
+        "https://media.istockphoto.com/id/1424988699/pt/foto/businessman-contemplating-in-the-office-looking-through-the-window.jpg?s=2048x2048&w=is&k=20&c=wBJDR4vHtkTnPGUxOroqIRPTTHaOGoK6tQOe49pD0i0=",
     },
     ana: {
       name: "Ana Carvalho",
       role: "QA Engineer",
       team: "Qualidade",
-      phone: "+55 11 95555-1072",
+      phone: "+55 11 4002-8922",
     },
   };
 
@@ -184,7 +193,7 @@ function buildEmployeeProfile(userId, username) {
     name: `Funcionario ${username}`,
     role: "Colaborador Interno",
     team: "Operacoes",
-    phone: "+55 11 95555-0000",
+    phone: "+55 11 4002-8922",
     favorites: {
       language: "Node",
       editor: "VS Code",
@@ -197,6 +206,7 @@ function buildEmployeeProfile(userId, username) {
       photos: "0",
     },
     note: "Sem anotacoes internas.",
+    photoUrl: "",
   };
   const entry = {
     ...defaultEntry,
@@ -218,6 +228,7 @@ function buildEmployeeProfile(userId, username) {
     favorites: entry.favorites,
     stats: entry.stats,
     note: entry.note,
+    photoUrl: entry.photoUrl || "",
   };
 }
 
@@ -233,6 +244,7 @@ function renderEmployeeAreaHtml(profile) {
     PROFILE_PHONE: profile.phone,
     PROFILE_TEAM: profile.team,
     PROFILE_AVATAR_YEAR: profile.avatarYear,
+    PROFILE_PHOTO_URL: profile.photoUrl,
     PROFILE_FAV_LANGUAGE: profile.favorites.language,
     PROFILE_FAV_EDITOR: profile.favorites.editor,
     PROFILE_FAV_TEAM: profile.favorites.team,

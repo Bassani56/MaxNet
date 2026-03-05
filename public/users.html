@@ -72,6 +72,20 @@
       font-weight: 700;
       color: #f8fafc;
       position: relative;
+      overflow: hidden;
+    }
+    .avatar img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      z-index: 1;
+    }
+    .avatar-initials {
+      position: relative;
+      z-index: 0;
     }
     .avatar-year {
       position: absolute;
@@ -85,6 +99,7 @@
       font-size: 12px;
       letter-spacing: 0.5px;
       font-weight: 700;
+      z-index: 2;
     }
     .hero-main {
       flex: 1;
@@ -187,7 +202,11 @@
     </header>
 
     <section class="card hero">
-      <div class="avatar">{{CURRENT_USER}}<span class="avatar-year">{{PROFILE_AVATAR_YEAR}}</span></div>
+      <div class="avatar">
+        <img src="{{PROFILE_PHOTO_URL}}" alt="Foto de {{PROFILE_NAME}}">
+        <span class="avatar-initials">{{CURRENT_USER}}</span>
+        <span class="avatar-year">{{PROFILE_AVATAR_YEAR}}</span>
+      </div>
       <div class="hero-main">
         <h2 class="name">{{PROFILE_NAME}}</h2>
         <span class="badge">{{PROFILE_ROLE}}</span>
@@ -284,18 +303,40 @@
   <script>
     (function renderAvatarInitials() {
       const avatar = document.querySelector(".avatar");
-      const raw = avatar ? avatar.textContent : "";
+      const avatarImage = avatar ? avatar.querySelector("img") : null;
+      const initialsNode = avatar ? avatar.querySelector(".avatar-initials") : null;
+      const raw = initialsNode ? initialsNode.textContent : "";
       const parts = String(raw || "")
         .trim()
         .split(/\s+/)
         .filter(Boolean);
 
-      if (!avatar || parts.length === 0) {
+      if (!avatar || !avatarImage) {
         return;
       }
 
-      const initials = parts.slice(0, 2).map((part) => part[0].toUpperCase()).join("");
-      avatar.textContent = initials;
+      function renderInitials() {
+        if (parts.length === 0) {
+          return;
+        }
+        const initials = parts.slice(0, 2).map((part) => part[0].toUpperCase()).join("");
+        avatarImage.style.display = "none";
+        if (initialsNode) {
+          initialsNode.textContent = initials;
+        }
+      }
+
+      if (!avatarImage.getAttribute("src")) {
+        renderInitials();
+        return;
+      }
+
+      avatarImage.addEventListener("error", renderInitials);
+      avatarImage.addEventListener("load", () => {
+        if (initialsNode) {
+          initialsNode.textContent = "";
+        }
+      });
     })();
   </script>
 </body>

@@ -1,0 +1,17 @@
+#LEAKING CODE
+
+
+### Descrição
+"Você foi contratado para fazer o penteste dessa empresa. Um adendo muito importante, a cultura dessa empresa é um pouco diferente. Os funcionários constumam usar muito as redes sociais, será que podemos encontrar algo com isso? Divirta-se com uma vibe de desafio mais interativo. Boa sorte!"
+
+### Disponível para os players
+Arquivo files.zip contendo os códigos.
+
+### Flag
+V3SP4S{ZWFzeSwgcmlnaHQ/}
+
+### Categoria
+ - Web
+
+; ### Observação
+; - O binário a ser disponibilizado para os players dentro do zip tem que ser o mesmo que estará no servidor para ser possível o exploit

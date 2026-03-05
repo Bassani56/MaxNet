@@ -79,32 +79,34 @@ button:hover { background: #16a34a; }
 </head>
 <body>
 <div class="card">
-  <h1>LOGIN</h1>
-  <div class="notice">Area interna: acesso permitido apenas para funcionarios autorizados.</div>
-  <form method="POST" action="/login">
-    <input name="username" placeholder="username" required>
-    <input name="password" placeholder="password" required>
-    <button type="submit">ENTRAR</button>
-  </form>
-  <div id="login-error" class="error"></div>
-  <div class="nav-links">
-    <a href="/">Voltar para a home</a>
-  </div>
+    <h1>LOGIN</h1>
+    <div class="notice">Area interna: acesso permitido apenas para funcionarios autorizados.</div>
+    <form method="POST" action="/login">
+        <input name="username" placeholder="username" required>
+        <input name="password" placeholder="password" required>
+        <button type="submit">ENTRAR</button>
+    </form>
+    <div id="login-error" class="error"></div>
+    <div class="nav-links">
+        <a href="/">Voltar para a home</a>
+    </div>
 </div>
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const error = params.get("error");
-  const errorMap = {
-    user_invalid: "Usuario invalido.",
-    password_invalid: "Senha invalida.",
-    both_invalid: "Usuario e senha invalidos.",
-  };
 
-  if (errorMap[error]) {
-    const errorElement = document.getElementById("login-error");
-    errorElement.textContent = errorMap[error];
-    errorElement.style.display = "block";
-  }
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get("error");
+    const errorMap = {
+        user_invalid: "Usuario invalido.",
+        password_invalid: "Senha invalida.",
+        both_invalid: "Usuario e senha invalidos.",
+    };
+
+    if (errorMap[error]) {
+        const errorElement = document.getElementById("login-error");
+        errorElement.textContent = errorMap[error];
+        errorElement.style.display = "block";
+    }
 </script>
+
 </body>
 </html>
