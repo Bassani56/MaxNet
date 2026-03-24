@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MaxNet - Internet de Alta Velocidade</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #1e293b;
+  background: #f8fafc;
+}
+
+/* Header */
+header {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  padding: 1.2rem 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+.header-contact {
+  font-size: 14px;
+  text-align: right;
+}
+
+.header-contact strong {
+  display: block;
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+.header-facebook {
+  margin-top: 6px;
+}
+.header-facebook a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #dbeafe;
+  text-decoration: none;
+  font-weight: 600;
+}
+.header-facebook a:hover {
+  text-decoration: underline;
+}
+.header-facebook svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Hero Section */
+.hero {
+  background: white;
+  margin-top: 30px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+}
+
+.hero-content {
+  padding: 50px 40px;
+}
+
+.hero h1 {
+  font-size: 42px;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  color: #0f172a;
+  max-width: 700px;
+}
+
+.hero-subtitle {
+  font-size: 18px;
+  color: #475569;
+  margin-bottom: 30px;
+  max-width: 650px;
+}
+
+.hero-image {
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Benefits */
+.benefits {
+  margin-top: 50px;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 40px;
+  color: #0f172a;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.benefit-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+}
+
+.benefit-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.benefit-card h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #1e40af;
+}
+
+.benefit-card p {
+  color: #64748b;
+  font-size: 15px;
+}
+
+/* Plans */
+.plans {
+  margin-top: 60px;
+  padding: 60px 0;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.plan-card {
+  background: white;
+  border-radius: 16px;
+  padding: 36px 28px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.plan-card.featured {
+  border-color: #3b82f6;
+  transform: scale(1.02);
+}
+
+.plan-badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: #3b82f6;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.plan-name {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+.plan-speed {
+  font-size: 48px;
+  font-weight: 900;
+  color: #1e40af;
+  margin-bottom: 4px;
+}
+
+.plan-speed small {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.plan-price {
+  font-size: 16px;
+  color: #64748b;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.plan-price strong {
+  font-size: 32px;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.plan-features {
+  list-style: none;
+  margin-bottom: 28px;
+}
+
+.plan-features li {
+  padding: 10px 0;
+  color: #475569;
+  font-size: 15px;
+}
+
+.plan-features li::before {
+  content: "✓";
+  color: #10b981;
+  font-weight: 900;
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.plan-button {
+  width: 100%;
+  padding: 14px;
+  background: #1e40af;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+}
+
+.plan-card.featured .plan-button {
+  background: #3b82f6;
+}
+
+/* Coverage */
+.coverage {
+  margin-top: 60px;
+  background: white;
+  padding: 50px 40px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.coverage h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #0f172a;
+}
+
+.coverage-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.coverage-item {
+  padding: 16px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #475569;
+}
+
+/* FAQ */
+.faq {
+  margin-top: 60px;
+  margin-bottom: 60px;
+}
+
+.faq-list {
+  max-width: 800px;
+  margin: 40px auto 0;
+}
+
+.faq-item {
+  background: white;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.faq-item h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #1e40af;
+}
+
+.faq-item p {
+  color: #64748b;
+  font-size: 15px;
+}
+
+/* Contact CTA */
+.contact-cta {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+  padding: 50px 40px;
+  border-radius: 16px;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.contact-cta h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.contact-cta p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.contact-methods {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.contact-method {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contact-method-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+  width: 40px;
+  height: 40px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.contact-method-icon svg {
+  width: 40px;
+  height: 40px;
+  display: block;
+  margin: 0 auto;
+}
+
+.contact-method strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.contact-method a {
+  color: #60a5fa;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Footer */
+footer {
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 40px 0 30px;
+  margin-top: 60px;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.footer-logo {
+  font-size: 24px;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.footer-content p {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.footer-legal {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #334155;
+  font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .header-contact {
+    text-align: center;
+  }
+
+  .hero-content {
+    padding: 30px 24px;
+  }
+
+  .hero h1 {
+    font-size: 32px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+
+  .hero-image {
+    height: 250px;
+  }
+
+  .section-title {
+    font-size: 28px;
+  }
+
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plans-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-card.featured {
+    transform: none;
+  }
+
+  .coverage-list {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-methods {
+    flex-direction: column;
+    gap: 24px;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <div class="logo">MaxNet</div>
+    <div class="header-contact">
+      <strong>(11) 4002-8922</strong>
+      <div class="header-facebook">
+        <a href="https://facebook-seven-sooty.vercel.app/profile/maxnet" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#dbeafe" d="M24 12a12 12 0 1 0-13.88 11.86v-8.39H7.08V12h3.04V9.36c0-3 1.79-4.66 4.53-4.66 1.31 0 2.68.23 2.68.23v2.95h-1.51c-1.49 0-1.95.92-1.95 1.87V12h3.33l-.53 3.47h-2.8v8.39A12 12 0 0 0 24 12z"/>
+          </svg>
+          Facebook
+        </a>
+      </div>
+      Atendimento seg-sex, 8h às 18h
+    </div>
+  </div>
+</header>
+
+
+<div class="container">
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Internet de fibra óptica rápida e estável</h1>
+      <p class="hero-subtitle">
+        Conexão de alta velocidade para sua casa ou negócio. Instalação em até 48 horas, roteador Wi-Fi incluso e suporte técnico local. Ideal para streaming, jogos, home office e muito mais.
+      </p>
+    </div>
+    <div class="hero-image">
+      <img src="https://play-lh.googleusercontent.com/I8XbFdZr5Ghe20IPjscqUVNsKZ4bNKMBuLBMQRrBOeE-ne2B15lgqunV3ZJCSbKNrt2d" alt="Tecnologia de fibra óptica">
+    </div>
+  </section>
+
+
+  <section class="benefits">
+    <h2 class="section-title">Por que escolher a MaxNet?</h2>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon">⚡</div>
+        <h3>Ultra Velocidade</h3>
+        <p>Fibra óptica com velocidade simétrica para download e upload sem oscilações.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🛠️</div>
+        <h3>Instalação Rápida</h3>
+        <p>Técnicos qualificados instalam em até 48 horas após a contratação.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">📶</div>
+        <h3>Wi-Fi Grátis</h3>
+        <p>Roteador Wi-Fi moderno incluso sem custo adicional na mensalidade.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">💬</div>
+        <h3>Suporte Local</h3>
+        <p>Equipe técnica da região pronta para resolver qualquer problema.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- [Gerencia] Revisar tabela de precos: ha divergencia com a campanha de marco/2026. Vou ajustar estes valores apos validacao final com o financeiro. -->
+<section class="plans">
+  <div class="container">
+    <h2 class="section-title">Escolha o plano ideal para você</h2>
+    <div class="plans-grid">
+      
+      <div class="plan-card">
+        <h3 class="plan-name">Start</h3>
+        <div class="plan-speed">300<small>MB</small></div>
+        <div class="plan-price">
+          <strong>R$ 89,90</strong>/mês
+        </div>
+        <ul class="plan-features">
+          <li>Download até 300 Mbps</li>
+          <li>Upload até 150 Mbps</li>
+          <li>Wi-Fi grátis incluso</li>
+          <li>Instalação em 48h</li>
+          <li>Suporte técnico local</li>
+        </ul>
+        <a href="#contato" class="plan-button">Assinar Plano</a>
+      </div>
+
+      <div class="plan-card featured">
+        <div class="plan-badge">Mais Popular</div>
+        <h3 class="plan-name">Turbo</h3>
+        <div class="plan-speed">600<small>MB</small></div>
+        <div class="plan-price">
+          <strong>R$ 119,90</strong>/mês
+        </div>
+        <ul class="plan-features">
+          <li>Download até 600 Mbps</li>
+          <li>Upload até 300 Mbps</li>
+          <li>Wi-Fi grátis incluso</li>
+          <li>Instalação em 48h</li>
+          <li>Suporte técnico prioritário</li>
+        </ul>
+        <a href="#contato" class="plan-button">Assinar Plano</a>
+      </div>
+
+      <div class="plan-card">
+        <h3 class="plan-name">Pro</h3>
+        <div class="plan-speed">1<small>GB</small></div>
+        <div class="plan-price">
+          <strong>R$ 159,90</strong>/mês
+        </div>
+        <ul class="plan-features">
+          <li>Download até 1 Gbps</li>
+          <li>Upload até 500 Mbps</li>
+          <li>Wi-Fi 6 Premium incluso</li>
+          <li>Instalação em 24h</li>
+          <li>Suporte VIP 24/7</li>
+        </ul>
+        <a href="#contato" class="plan-button">Assinar Plano</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TODO (dev-jana): vou abrir commit amanha para corrigir o espaçamento mobile desta seção de contato. -->
+<div class="container">
+  <section class="coverage">
+    <h2>Áreas de Cobertura</h2>
+    <p>Estamos presentes nos seguintes bairros e regiões:</p>
+    <div class="coverage-list">
+      <div class="coverage-item">📍 Centro</div>
+      <div class="coverage-item">📍 Jardim Paulista</div>
+      <div class="coverage-item">📍 Vila Mariana</div>
+      <div class="coverage-item">📍 Mooca</div>
+      <div class="coverage-item">📍 Tatuapé</div>
+      <div class="coverage-item">📍 Pinheiros</div>
+      <div class="coverage-item">📍 Brooklin</div>
+      <div class="coverage-item">📍 Ipiranga</div>
+    </div>
+    <p style="margin-top: 20px; color: #64748b; font-size: 14px;">
+      Não encontrou seu bairro? Entre em contato para verificar disponibilidade.
+    </p>
+  </section>
+
+  
+  <section class="faq">
+    <h2 class="section-title">Perguntas Frequentes</h2>
+    <div class="faq-list">
+      
+      <div class="faq-item">
+        <h3>Qual o prazo de instalação?</h3>
+        <p>A instalação é realizada em até 48 horas úteis após aprovação do cadastro. Para o plano Pro, oferecemos instalação expressa em até 24 horas.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Há fidelidade ou multa de cancelamento?</h3>
+        <p>Não exigimos contrato de fidelidade. Você pode cancelar quando quiser sem pagar multa.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>O roteador Wi-Fi está incluso?</h3>
+        <p>Sim! Todos os planos incluem roteador Wi-Fi sem custo adicional. O equipamento fica em comodato durante a vigência do contrato.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Como funciona o suporte técnico?</h3>
+        <p>Oferecemos suporte via WhatsApp e telefone. Para problemas técnicos, nossa equipe agenda visita no mesmo dia ou em até 24 horas.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>A velocidade é garantida?</h3>
+        <p>Sim. Trabalhamos com fibra óptica que garante a velocidade contratada. A velocidade pode variar conforme a qualidade do Wi-Fi e dispositivos conectados.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="contact-cta" id="contato">
+    <h2>Pronto para ter a melhor internet?</h2>
+    <p>Entre em contato agora e agende sua instalação</p>
+    <div class="contact-methods">
+      
+      <div class="contact-method">
+        <div class="contact-method-icon">📱</div>
+        <strong>WhatsApp</strong>
+        <a>(11) 4002-8922</a>
+      </div>
+
+      <div class="contact-method">
+        <div class="contact-method-icon">📞</div>
+        <strong>Telefone</strong>
+        <a>(11) 4002-8922</a>
+      </div>
+
+      <div class="contact-method">
+        <div class="contact-method-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#1877F2" d="M24 12a12 12 0 1 0-13.88 11.86v-8.39H7.08V12h3.04V9.36c0-3 1.79-4.66 4.53-4.66 1.31 0 2.68.23 2.68.23v2.95h-1.51c-1.49 0-1.95.92-1.95 1.87V12h3.33l-.53 3.47h-2.8v8.39A12 12 0 0 0 24 12z"/>
+          </svg>
+        </div>
+        <strong>Facebook</strong>
+        <a href="https://facebook-seven-sooty.vercel.app/profile/maxnet" target="_blank" rel="noopener noreferrer">Acessar página</a>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+
+<footer>
+  <div class="footer-content">
+    <div class="footer-logo">MaxNet</div>
+    <p>Internet de fibra óptica de alta velocidade</p>
+    <p>Atendimento: Segunda a Sexta, 8h às 18h</p>
+    <div class="footer-legal">
+      <p>&copy; 2026 MaxNet Telecomunicações. Todos os direitos reservados.</p>
+      <p>CNPJ: 00.000.000/0001-00 | Este é um site fictício para fins demonstrativos.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+#LEAKING CODE
+
+
+### Descrição
+"Você foi contratado para conduzir o pentest da empresa MaxNet. Há um detalhe importante: a cultura interna é diferente do comum, e os funcionários usam redes sociais com frequência. Talvez algumas pistas estejam justamente lá fora. Explore, conecte os pontos e aproveite um desafio com pegada mais interativa. Boa sorte!"
+
+### Deploy do docker
+docker build -t ctf_entrar . 
+docker run -p 3000:3000 ctf_entrar
